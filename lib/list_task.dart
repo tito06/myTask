@@ -7,7 +7,7 @@ class ListTask extends StatelessWidget{
    ListTask({super.key});
 
 
-String? email = FirebaseAuth.instance.currentUser?.displayName;
+String? name = FirebaseAuth.instance.currentUser?.displayName;
 
   DatabaseReference databaseRef = FirebaseDatabase.instance.ref("${FirebaseAuth.instance.currentUser?.displayName}");
 
@@ -34,9 +34,9 @@ String? email = FirebaseAuth.instance.currentUser?.displayName;
                  
                 
             return ListTile(
-              
             
-              title: (snapshot.value != null) ? Text(snapshot.children.first.value.toString()) : Text("No Data"),
+            
+              title: (snapshot.value != null) ? Text(databaseRef.child("name").toString()) : Text("No Data"),
               subtitle: Text(snapshot.children.last.value.toString()),
             );
           },

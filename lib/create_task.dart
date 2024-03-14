@@ -11,6 +11,8 @@ class CreateTask extends StatelessWidget{
 
   TextEditingController name = TextEditingController();
   TextEditingController task = TextEditingController();
+    TextEditingController date = TextEditingController();
+
 
   DatabaseReference ref = FirebaseDatabase.instance.ref();
 
@@ -19,20 +21,53 @@ class CreateTask extends StatelessWidget{
 
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(title: Text("Create Task"),
-        leading: InkWell(
-          onTap: () {
+        appBar: AppBar(
+          leading: IconButton(onPressed: (){
             Navigator.pop(context);
-          },
-          child: Icon(
-            Icons.arrow_back_ios,
-            color: Colors.black54,
-          )),),
+          }, icon: Icon(Icons.arrow_back_ios_new)),
+            backgroundColor:const Color.fromARGB(255, 203, 156, 239),
+
+      ),
         
-        body: Center(
-          child: Column(
+        body: Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        color: Color.fromARGB(255, 203, 156, 239),
+        child:  Center(
+          child: SingleChildScrollView(
+            child:Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("NAME:"),
+                Container(
+                  padding: EdgeInsets.fromLTRB(30, 0, 0, 20),
+                  child: const Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Add new task.",
+                    style: const TextStyle(fontSize: 20,
+                    fontFamily: 'Montserrat',
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold),),
+  
+                  ]),
+                ),
+       Container(
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                padding: EdgeInsets.fromLTRB(5, 30, 0, 0),
+                 decoration: const BoxDecoration(
+                  color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(50.0),
+          bottomRight: Radius.circular(20.0),
+        ),
+        
+      ),
+
+
+            child: Column(children: [
                Padding(padding: const EdgeInsets.symmetric(vertical: 8.0,horizontal: 13.0),
               child:  TextField(
                 controller: name,
@@ -42,7 +77,6 @@ class CreateTask extends StatelessWidget{
                     ),  
               )),
 
-               Text("TASK:"),
                Padding(padding: const EdgeInsets.symmetric(vertical: 8.0,horizontal: 13.0),
               child:  TextField(
                 controller: task,
@@ -52,18 +86,40 @@ class CreateTask extends StatelessWidget{
                     ),  
               )),
 
+               Padding(padding: const EdgeInsets.symmetric(vertical: 8.0,horizontal: 13.0),
+              child:  TextField(
+                controller: date,
+                  decoration: const InputDecoration(
+                      border: OutlineInputBorder(),  
+                      labelText: 'Date',  
+                    ),
+                    onTap: (){
+                      _selectDate(context);
+                    },  
+              )),
+
               Padding(padding: const EdgeInsets.symmetric(vertical: 8.0,horizontal: 13.0),
+
               child :Container(  
-              margin: const EdgeInsets.all(0), 
               width: double.infinity, 
               height: 50.0,
-              child: ElevatedButton(
-                child: const Text('Create',
+              decoration: const BoxDecoration(
+                  color: Color.fromARGB(255, 154, 51, 232),
+                  borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20.0),
+                  bottomRight: Radius.circular(20.0),
+                  bottomLeft: Radius.circular(20)
+                  ),
+        
+              ),
+
+              child: TextButton(
+                child:  Text('Add',
                  style: TextStyle(fontSize: 20.0,
                   color: Color.fromARGB(254, 255, 255, 255)),),
                   style: ElevatedButton.styleFrom(
-                  backgroundColor: Color.fromARGB(255, 154, 51, 232)
-                ),
+                   backgroundColor: Colors.transparent
+                  ),
                 onPressed: () async{
   
                   final prefs = await SharedPreferences.getInstance();
@@ -76,7 +132,8 @@ class CreateTask extends StatelessWidget{
                    await ref.child("$userName").push().set(
                 {
                   "name": name.value.text,
-                  "task": task.value.text
+                  "task": task.value.text,
+                  "date": date.value.text
                 });
 
 
@@ -107,10 +164,48 @@ class CreateTask extends StatelessWidget{
                 },
               )))
 
+            ],)
+)
+
             ],
           ),
-        ),),
+          )
+          
+          
+
+        ),
+        )
+        
+        
+),
     );
+  }
+
+
+  _selectDate(BuildContext context) async {
+    showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2030),
+      builder: (context, picker) {
+        return Theme(
+          data: ThemeData.dark().copyWith(
+      colorScheme: const ColorScheme.dark(
+        primary: Colors.deepPurple,
+        onPrimary: Colors.white,
+        surface: Colors.pink,
+        onSurface: Colors.yellow),
+        dialogBackgroundColor:Colors.green[900],
+          ),
+           child: picker!,);
+      }).then((value){
+        if(value != null){
+          date.text = value.toString();
+        }
+      });
+      
+      
   }
 
 

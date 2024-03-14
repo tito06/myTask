@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
@@ -20,8 +22,13 @@ class _homePagestate extends State<HomePage>{
 
     String? email = FirebaseAuth.instance.currentUser?.displayName;
 
+    List<String> dataList = [];
 
-   DatabaseReference databaseRef = FirebaseDatabase.instance.ref("${FirebaseAuth.instance.currentUser?.displayName}");
+   //DatabaseReference databaseRef = FirebaseDatabase.instance.ref("${FirebaseAuth.instance.currentUser?.displayName}");
+
+   DatabaseReference databaseRef = FirebaseDatabase.instance.ref().child("${FirebaseAuth.instance.currentUser?.displayName}");
+
+   
 
 
   _changeTab(int index) {
@@ -40,9 +47,15 @@ class _homePagestate extends State<HomePage>{
            print(name);
 
     return Scaffold(
+    
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 203, 156, 239),
-        title: Text("Hey, ${name}", style: TextStyle(fontSize: 20),),
+        leading: SizedBox(
+          height: 8.0,
+          width: 8.0,
+          child: IconButton(onPressed: (){},
+         icon: Image.asset('assets/side_menu.png'))
+        ),
+        backgroundColor:const Color.fromARGB(255, 203, 156, 239),
         actions: <Widget>[
               IconButton(
                 icon: const Icon(Icons.circle_outlined),
@@ -54,78 +67,136 @@ class _homePagestate extends State<HomePage>{
               ),
             ]
       ),
-      body: SingleChildScrollView(
+      body: Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        color: Color.fromARGB(255, 203, 156, 239),
+
+        child: SingleChildScrollView(
         child:  Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  
           children: [
-              Container(
-                height: 100,
+
+                Container(
+                  padding: EdgeInsets.fromLTRB(20, 0, 0, 20),
+                  child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Hey, $name",
+                    style: const TextStyle(fontSize: 20,
+                    fontFamily: 'Montserrat',
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold),),
+                    const Text("you have 7 tasks today.",
+                    style: TextStyle(fontSize: 20,
+                    fontFamily: 'Montserrat',
+                    fontWeight: FontWeight.bold),)
+                  ]),
+                ),
+        
+
+             Container(
+                height: MediaQuery.of(context).size.height,
                 width: MediaQuery.of(context).size.width,
+                padding: EdgeInsets.fromLTRB(5, 20, 0, 0),
                  decoration: const BoxDecoration(
-                  color: Color.fromARGB(255, 203, 156, 239),
+                  color: Colors.white,
         borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(20.0),
+          topLeft: Radius.circular(50.0),
           bottomRight: Radius.circular(20.0),
         ),
         
       ),
-                child: const Padding(padding: EdgeInsets.all(8),
-                child:  Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Welcome back",
-                    style: TextStyle(fontSize: 20),),
-                     Text("you have 7 tasks today.",
-                    style: TextStyle(fontSize: 20),)
-                  ]),)
-              ),
 
+       child: SizedBox(
+            height: MediaQuery.of(context).size.height,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
+                  child:const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                       Text("Today",
+                  
+                style:  TextStyle(fontSize: 20,
+              fontFamily: 'Montserrat',
+              fontWeight: FontWeight.w700,
+              color: Colors.black87
+            
+                )),
 
-        const  Padding(padding: EdgeInsets.fromLTRB(8, 8, 0, 0),
-          child: Text("Today's Task",
-              style: TextStyle(fontSize: 20),),
-          ),
-
-           SizedBox(
-            height: 400,
-            child:Padding(padding: EdgeInsets.fromLTRB(0,8,0,0),
-            child:   FirebaseAnimatedList(
+                 Icon(Icons.calendar_month_outlined)  
+                    ],
+                  )
+                ),
+                Expanded(
+                  child:  FirebaseAnimatedList(
           query: databaseRef,
           itemBuilder: (BuildContext context, DataSnapshot snapshot,
               Animation<double> animation, int index) {
                  
-                
-            return ListTile(
-              
+              final Map<dynamic, dynamic>? data = snapshot.value as Map<dynamic, dynamic>?;
+
+               var date = data!= null ? data["date"] : DateTime.now();
+
+            return 
             
-              title: (snapshot.value != null) ? Text(snapshot.children.first.value.toString()) : Text("No Data"),
-              subtitle: Text(snapshot.children.last.value.toString()),
+            ListTile(
+              
+               
+              title: (data != null) ? Text("${data["name"]}",
+              style:const TextStyle(
+                fontFamily: 'Montserrat',
+              fontWeight: FontWeight.w700,
+              ),) : const Text("No Data",
+              style: TextStyle(
+                fontFamily: 'Montserrat',
+              fontWeight: FontWeight.w900,
+              ),),
+              subtitle: (data != null) ? Text("${data["task"]}",
+              style: const TextStyle(
+                fontFamily: 'Montserrat',
+              fontWeight: FontWeight.w700,
+              ),) : const Text("No Data",
+              style: TextStyle(fontFamily: 'Montserrat',
+              fontWeight: FontWeight.w700,),),
             );
+            
           },
-        ),   
+        ), )
+              ],
+            ),
+
+            
+             
            )),
 
-          const Padding(padding: EdgeInsets.fromLTRB(8, 8, 0, 0),
-          child: Text("Upcoming Task",
-              style: TextStyle(fontSize: 20),),
-          ),
-    
-
-
           ])),
-         bottomNavigationBar: BottomNavigationBar(
-          backgroundColor: Color.fromARGB(255, 203, 156, 239),
+      ),
+
+        bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Color.fromARGB(255, 203, 156, 239),
         currentIndex: _selectedTab,
         onTap: (index) => _changeTab(index),
         selectedItemColor: Color.fromARGB(255, 164, 65, 240),
         unselectedItemColor: Color.fromARGB(255, 59, 1, 104),
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.add), label: "Create Task"),
+          BottomNavigationBarItem(icon: Image.asset('assets/home.png',
+          height: 25,
+          width: 25,), label: "Home"),
+          BottomNavigationBarItem(icon: Image.asset('assets/add.png',
+          height: 25,
+          width: 25,), label: "Create Task"),
           BottomNavigationBarItem(
-              icon: Icon(Icons.person_2_rounded), label: "Profile"),
+              icon: Image.asset('assets/upcoming.png',
+              height: 25,
+          width: 25,), label: "Upcomming task"),
          
         ],
       ),
