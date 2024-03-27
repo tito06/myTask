@@ -27,14 +27,31 @@ class Register extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
   return  Scaffold(
+    backgroundColor: const Color.fromARGB(255, 203, 156, 239),
+
     appBar: AppBar(
+      backgroundColor: const Color.fromARGB(255, 203, 156, 239),
       title:const Text("REGISTER",
-      style: TextStyle(color: Colors.black38,
+      style: TextStyle(color: Colors.white,
+      fontFamily: 'Montserrat',
       fontStyle: FontStyle.normal,
       fontWeight: FontWeight.w900,
       fontSize: 25.0),),
     ),
-    body: SingleChildScrollView(child: Column(
+    body: SingleChildScrollView(
+      child:  Container(
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                padding: EdgeInsets.fromLTRB(5, 20, 0, 0),
+                 decoration: const BoxDecoration(
+                  color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(50.0),
+          bottomRight: Radius.circular(20.0),
+        ),
+        
+      ),
+      child:       Column(
     
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,11 +123,22 @@ class Register extends StatelessWidget{
               margin: const EdgeInsets.all(0), 
               width: double.infinity, 
               height: 50.0,
+              decoration: const BoxDecoration(
+                  color: Color.fromARGB(255, 154, 51, 232),
+                  borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20.0),
+                  bottomRight: Radius.circular(20.0),
+                  bottomLeft: Radius.circular(20)
+                  ),
+        
+              ), 
               child: ElevatedButton(  
                 
                 child: const Text('Register',
                  style: TextStyle(fontSize: 20.0,
-                  color: Color.fromARGB(254, 255, 255, 255)),),  
+                 fontFamily: 'Montserrat',
+                 fontWeight: FontWeight.bold ,
+                  color: Colors.white),),  
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color.fromARGB(255, 154, 51, 232)
                 ),
@@ -126,7 +154,7 @@ class Register extends StatelessWidget{
                     }
                     if(context.mounted){
                       
-                        Navigator.push(context,
+                        Navigator.pushReplacement(context,
                       MaterialPageRoute(builder: (context)=>  HomePage()));
                     }
                   } else {
@@ -152,8 +180,19 @@ class Register extends StatelessWidget{
               margin: EdgeInsets.all(0),  
               width: double.infinity,
               height: 50.0,
+              decoration: const BoxDecoration(
+                  color: Color.fromARGB(255, 154, 51, 232),
+                  borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20.0),
+                  bottomRight: Radius.circular(20.0),
+                  bottomLeft: Radius.circular(20)
+                  ),
+        
+              ), 
               child:  ElevatedButton(  
                 child:  Text('Login', style: TextStyle(
+                fontFamily: 'Montserrat',
+                  fontWeight: FontWeight.bold,
                   fontSize: 20.0,
                   color: Colors.white),), 
                   style: ElevatedButton.styleFrom(
@@ -162,7 +201,7 @@ class Register extends StatelessWidget{
                    
                 onPressed: ()  {
                   
-                        Navigator.push(context,
+                        Navigator.pushReplacement(context,
                       MaterialPageRoute(builder: (context)=>  Login()));
                     }
                   
@@ -172,7 +211,10 @@ class Register extends StatelessWidget{
       ],
     
 
-  )),
+  ) )
+      
+      
+),
   );
     
   }

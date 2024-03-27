@@ -1,3 +1,4 @@
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
@@ -21,7 +22,7 @@ String? name = FirebaseAuth.instance.currentUser?.displayName;
           onTap: () {
             Navigator.pop(context);
           },
-          child: Icon(
+          child:const Icon(
             Icons.arrow_back_ios,
             color: Colors.black54,
           ),
@@ -32,17 +33,65 @@ String? name = FirebaseAuth.instance.currentUser?.displayName;
           itemBuilder: (BuildContext context, DataSnapshot snapshot,
               Animation<double> animation, int index) {
                  
+        final Map<dynamic, dynamic>? data = snapshot.value as Map<dynamic, dynamic>?;
+
                 
-            return ListTile(
-            
-            
-              title: (snapshot.value != null) ? Text(databaseRef.child("name").toString()) : Text("No Data"),
-              subtitle: Text(snapshot.children.last.value.toString()),
-            );
+            return CardViewData(context,
+            data != null ? data["name"] : "NO DATA",
+             data != null? data["task"] : "NO DATA",
+             data != null? data["date"]: "No date added",
+             data != null? data["time"]: "No time added");
           },
         ),
       ),
     );
   }
+
+    Widget CardViewData(BuildContext context, name, String task, String date, String time){
+    return Card(
+      elevation: 50,
+      shadowColor: Colors.black,
+      child: ConstrainedBox(
+        //width: MediaQuery.of(context).size.width,
+        //height: 120,
+        constraints: (
+          BoxConstraints(
+            minWidth: MediaQuery.of(context).size.width,
+            minHeight: 100,
+          )
+        ),
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(10, 20, 10, 10),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+             Text(name,
+              style:const TextStyle(
+                fontFamily: 'Montserrat',
+              fontWeight: FontWeight.bold,
+            
+              ),),
+              Text(task,
+              style: const TextStyle(
+                fontFamily: 'Montserrat',
+              fontWeight: FontWeight.w700,
+              ),),
+              Text(date,
+              style: const TextStyle(
+                fontFamily: 'Montserrat',
+              fontWeight: FontWeight.w700,
+              ),),
+              Text(time,
+              style: const TextStyle(
+                fontFamily: 'Montserrat',
+              fontWeight: FontWeight.w700,
+              ),)  
+            ]),),
+      ),
+    );
   
+  
+}
+
 }

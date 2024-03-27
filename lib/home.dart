@@ -4,7 +4,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:my_task/create_task.dart';
+import 'package:my_task/list_task.dart';
+import 'package:my_task/login.dart';
 
 class HomePage extends StatefulWidget{
   const HomePage({super.key});
@@ -22,6 +25,10 @@ class _homePagestate extends State<HomePage>{
 
     String? email = FirebaseAuth.instance.currentUser?.displayName;
 
+
+    String? date = DateFormat.yMMMEd().format(DateTime.now());
+    var dataDate;
+
     List<String> dataList = [];
 
    //DatabaseReference databaseRef = FirebaseDatabase.instance.ref("${FirebaseAuth.instance.currentUser?.displayName}");
@@ -36,6 +43,10 @@ class _homePagestate extends State<HomePage>{
       _selectedTab = index;
       if(index == 1){
         Navigator.push(context, MaterialPageRoute(builder:(context)=> CreateTask()));
+      } else if( index == 0){
+        Navigator.push(context, MaterialPageRoute(builder: (context)=> HomePage()));
+      }else{
+        Navigator.push(context, MaterialPageRoute(builder: (context)=> ListTask()));
       }
     });
   }
@@ -44,17 +55,11 @@ class _homePagestate extends State<HomePage>{
   Widget build(BuildContext context) {
 
       var name = FirebaseAuth.instance.currentUser?.displayName;
-           print(name);
 
     return Scaffold(
     
       appBar: AppBar(
-        leading: SizedBox(
-          height: 8.0,
-          width: 8.0,
-          child: IconButton(onPressed: (){},
-         icon: Image.asset('assets/side_menu.png'))
-        ),
+        
         backgroundColor:const Color.fromARGB(255, 203, 156, 239),
         actions: <Widget>[
               IconButton(
@@ -66,6 +71,20 @@ class _homePagestate extends State<HomePage>{
                 },
               ),
             ]
+      ),
+      drawer: Drawer(
+        child: ListView(
+          children:[
+            const DrawerHeader(child: Text("Header")),
+
+            ListTile(
+              title: Text('Log Out'),
+              onTap: (){
+                  _signOut(context);
+              },
+            )
+          ],
+        ),
       ),
       body: Container(
         width: MediaQuery.of(context).size.width,
@@ -119,19 +138,22 @@ class _homePagestate extends State<HomePage>{
               children: [
                 Container(
                   padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                  child:const Row(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                       Text("Today",
+                       Text(date == DateFormat.yMMMEd().format(DateTime.now()) || date == null ? "TODAY": date!,
                   
-                style:  TextStyle(fontSize: 20,
+                style: const TextStyle(fontSize: 20,
               fontFamily: 'Montserrat',
               fontWeight: FontWeight.w700,
               color: Colors.black87
             
                 )),
 
-                 Icon(Icons.calendar_month_outlined)  
+                IconButton(onPressed: (){
+                    _selectDate(context);
+                },
+                 icon: Icon(Icons.calendar_month_outlined))
                     ],
                   )
                 ),
@@ -143,30 +165,18 @@ class _homePagestate extends State<HomePage>{
                  
               final Map<dynamic, dynamic>? data = snapshot.value as Map<dynamic, dynamic>?;
 
-               var date = data!= null ? data["date"] : DateTime.now();
-
-            return 
-            
-            ListTile(
-              
+              if(data!= null){
+                
+                 dataDate = data["date"];
+                  
                
-              title: (data != null) ? Text("${data["name"]}",
-              style:const TextStyle(
-                fontFamily: 'Montserrat',
-              fontWeight: FontWeight.w700,
-              ),) : const Text("No Data",
-              style: TextStyle(
-                fontFamily: 'Montserrat',
-              fontWeight: FontWeight.w900,
-              ),),
-              subtitle: (data != null) ? Text("${data["task"]}",
-              style: const TextStyle(
-                fontFamily: 'Montserrat',
-              fontWeight: FontWeight.w700,
-              ),) : const Text("No Data",
-              style: TextStyle(fontFamily: 'Montserrat',
-              fontWeight: FontWeight.w700,),),
-            );
+              }
+
+            return ( dataDate == date)?
+             CardViewData(data != null? data["name"] : "NO DATA",
+             data != null? data["task"] : "NO DATA",
+             data != null? data["date"]: "No date added",
+             data != null? data["time"]: "No time added") : const SizedBox();
             
           },
         ), )
@@ -201,6 +211,89 @@ class _homePagestate extends State<HomePage>{
         ],
       ),
     );
+  }
+
+  Widget CardViewData(String name, String task, String date, String time){
+    return Card(
+      elevation: 50,
+      shadowColor: Colors.black,
+      child: ConstrainedBox(
+        //width: MediaQuery.of(context).size.width,
+        //height: 120,
+        constraints: (
+          BoxConstraints(
+            minWidth: MediaQuery.of(context).size.width,
+            minHeight: 100,
+          )
+        ),
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(10, 20, 10, 10),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+             Text(name,
+              style:const TextStyle(
+                fontFamily: 'Montserrat',
+              fontWeight: FontWeight.bold,
+            
+              ),),
+              Text(task,
+              style: const TextStyle(
+                fontFamily: 'Montserrat',
+              fontWeight: FontWeight.w700,
+              ),),
+              Text(date,
+              style: const TextStyle(
+                fontFamily: 'Montserrat',
+              fontWeight: FontWeight.w700,
+              ),),
+              Text(time,
+              style: const TextStyle(
+                fontFamily: 'Montserrat',
+              fontWeight: FontWeight.w700,
+              ),)   
+            ]),),
+      ),
+    );
+  }
+
+    Future<void> _signOut(BuildContext context) async {
+  await FirebaseAuth.instance.signOut();
+  Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => Login()), (route) => false);
+}
+
+  _selectDate(BuildContext context) async {
+    showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2030),
+      builder: (context, picker) {
+        return Theme(
+          data: ThemeData.dark().copyWith(
+      colorScheme: const ColorScheme.dark(
+        primary: Colors.deepPurple,
+        onPrimary: Colors.white,
+        surface: Color.fromARGB(255, 203, 156, 239),
+        onSurface: Colors.black),
+        dialogBackgroundColor:Colors.green[900],
+          ),
+           child: picker!,);
+      }).then((value){
+        if(value != null){
+          setState(() {
+            String formattedDate = DateFormat.yMMMEd().format(value);
+
+          
+            date = formattedDate;
+          
+
+          });
+        }
+      });
+      
+      
   }
 
   

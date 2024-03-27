@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:intl/intl.dart';
 import 'package:my_task/list_task.dart';
+import 'package:my_task/login.dart';
 import 'package:my_task/register.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -11,7 +13,11 @@ class CreateTask extends StatelessWidget{
 
   TextEditingController name = TextEditingController();
   TextEditingController task = TextEditingController();
-    TextEditingController date = TextEditingController();
+  TextEditingController date = TextEditingController();
+  TextEditingController time = TextEditingController();
+
+ 
+
 
 
   DatabaseReference ref = FirebaseDatabase.instance.ref();
@@ -99,6 +105,36 @@ class CreateTask extends StatelessWidget{
               )),
 
               Padding(padding: const EdgeInsets.symmetric(vertical: 8.0,horizontal: 13.0),
+              child:  TextField(
+                controller: time,
+                  decoration: const InputDecoration(
+                      border: OutlineInputBorder(),  
+                      labelText: 'Select time',  
+                    ),
+                    onTap: (){
+                       showTimePicker(
+    initialEntryMode: TimePickerEntryMode.dial,
+    context: context,
+    initialTime: TimeOfDay.now(),
+    cancelText:  "Cancel",
+    confirmText:  "Save",
+    helpText:  "Select time",
+    builder: (context, Widget? child) {
+      return MediaQuery(
+        data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: false),
+        child: child!,
+      );
+    },
+  ).then((value) {
+    if(value != null){
+      TimeOfDay setTime = value;
+      time.text = setTime.format(context).toString();
+    }
+  } );
+                    },  
+              )),
+
+              Padding(padding: const EdgeInsets.symmetric(vertical: 8.0,horizontal: 13.0),
 
               child :Container(  
               width: double.infinity, 
@@ -133,7 +169,8 @@ class CreateTask extends StatelessWidget{
                 {
                   "name": name.value.text,
                   "task": task.value.text,
-                  "date": date.value.text
+                  "date": date.value.text,
+                  "time": time.value.text
                 });
 
 
@@ -144,25 +181,7 @@ class CreateTask extends StatelessWidget{
                   }           
                 },
               ))),
-             Padding(padding: const EdgeInsets.symmetric(vertical: 8.0,horizontal: 13.0),
-              child :Container(  
-              margin: const EdgeInsets.all(0), 
-              width: double.infinity, 
-              height: 50.0,
-              child: ElevatedButton(
-                child: const Text('Sign Out',
-                 style: TextStyle(fontSize: 20.0,
-                  color: Color.fromARGB(254, 255, 255, 255)),),
-                  style: ElevatedButton.styleFrom(
-                  backgroundColor: Color.fromARGB(255, 154, 51, 232)
-                ),
-                onPressed: () {
-                 _signOut(); 
-
-                
-
-                },
-              )))
+            
 
             ],)
 )
@@ -194,14 +213,17 @@ class CreateTask extends StatelessWidget{
       colorScheme: const ColorScheme.dark(
         primary: Colors.deepPurple,
         onPrimary: Colors.white,
-        surface: Colors.pink,
-        onSurface: Colors.yellow),
+        surface: Color.fromARGB(255, 203, 156, 239),
+        onSurface: Colors.black),
         dialogBackgroundColor:Colors.green[900],
           ),
            child: picker!,);
       }).then((value){
         if(value != null){
-          date.text = value.toString();
+          
+          String formattedDate = DateFormat.yMMMEd().format(value);
+
+          date.text = formattedDate;
         }
       });
       
@@ -209,8 +231,6 @@ class CreateTask extends StatelessWidget{
   }
 
 
-  Future<void> _signOut() async {
-  await FirebaseAuth.instance.signOut();
-}
+
   
 }
