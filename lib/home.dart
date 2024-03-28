@@ -120,7 +120,7 @@ class _homePagestate extends State<HomePage>{
              Container(
                 height: MediaQuery.of(context).size.height,
                 width: MediaQuery.of(context).size.width,
-                padding: EdgeInsets.fromLTRB(5, 20, 0, 0),
+                padding: const EdgeInsets.fromLTRB(5, 20, 0, 0),
                  decoration: const BoxDecoration(
                   color: Colors.white,
         borderRadius: BorderRadius.only(
@@ -153,7 +153,7 @@ class _homePagestate extends State<HomePage>{
                 IconButton(onPressed: (){
                     _selectDate(context);
                 },
-                 icon: Icon(Icons.calendar_month_outlined))
+                 icon: const Icon(Icons.calendar_month_outlined))
                     ],
                   )
                 ),
@@ -164,19 +164,17 @@ class _homePagestate extends State<HomePage>{
               Animation<double> animation, int index) {
                  
               final Map<dynamic, dynamic>? data = snapshot.value as Map<dynamic, dynamic>?;
-
               if(data!= null){
                 
+                data['key'] = snapshot.key;
+
                  dataDate = data["date"];
                   
                
               }
 
             return ( dataDate == date)?
-             CardViewData(data != null? data["name"] : "NO DATA",
-             data != null? data["task"] : "NO DATA",
-             data != null? data["date"]: "No date added",
-             data != null? data["time"]: "No time added") : const SizedBox();
+             CardViewData(data!) : const SizedBox();
             
           },
         ), )
@@ -191,11 +189,11 @@ class _homePagestate extends State<HomePage>{
       ),
 
         bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Color.fromARGB(255, 203, 156, 239),
+        backgroundColor: const Color.fromARGB(255, 203, 156, 239),
         currentIndex: _selectedTab,
         onTap: (index) => _changeTab(index),
-        selectedItemColor: Color.fromARGB(255, 164, 65, 240),
-        unselectedItemColor: Color.fromARGB(255, 59, 1, 104),
+        selectedItemColor:const Color.fromARGB(255, 164, 65, 240),
+        unselectedItemColor: const Color.fromARGB(255, 59, 1, 104),
         items: [
           BottomNavigationBarItem(icon: Image.asset('assets/home.png',
           height: 25,
@@ -213,13 +211,11 @@ class _homePagestate extends State<HomePage>{
     );
   }
 
-  Widget CardViewData(String name, String task, String date, String time){
+  Widget CardViewData(Map data){
     return Card(
       elevation: 50,
       shadowColor: Colors.black,
       child: ConstrainedBox(
-        //width: MediaQuery.of(context).size.width,
-        //height: 120,
         constraints: (
           BoxConstraints(
             minWidth: MediaQuery.of(context).size.width,
@@ -227,52 +223,65 @@ class _homePagestate extends State<HomePage>{
           )
         ),
         child: Padding(
-          padding: EdgeInsets.fromLTRB(10, 20, 10, 10),
-          child: Column(
+          padding: const EdgeInsets.fromLTRB(10, 20, 10, 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+          Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-             Text(name,
+             Text(data['name'],
               style:const TextStyle(
                 fontFamily: 'Montserrat',
               fontWeight: FontWeight.bold,
+              fontSize: 22.0
             
               ),),
-              Text(task,
+              Text(data['task'],
               style: const TextStyle(
                 fontFamily: 'Montserrat',
               fontWeight: FontWeight.w700,
               ),),
-              Text(date,
+              Text(data['date'],
               style: const TextStyle(
                 fontFamily: 'Montserrat',
               fontWeight: FontWeight.w700,
               ),),
-              Text(time,
+              Text(data['time'],
               style: const TextStyle(
                 fontFamily: 'Montserrat',
               fontWeight: FontWeight.w700,
               ),)   
-            ]),),
+            ]),
+
+            IconButton(onPressed: (){
+                databaseRef.child(data['key']).remove();
+            }, 
+            icon:const Icon(Icons.delete))
+            
+
+            ],
+          )),
       ),
     );
   }
 
     Future<void> _signOut(BuildContext context) async {
   await FirebaseAuth.instance.signOut();
-  Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => Login()), (route) => false);
+    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => const Login()), (route) => false);
 }
 
   _selectDate(BuildContext context) async {
     showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
+      firstDate: DateTime(2024),
       lastDate: DateTime(2030),
       builder: (context, picker) {
         return Theme(
           data: ThemeData.dark().copyWith(
-      colorScheme: const ColorScheme.dark(
+      colorScheme: const ColorScheme.dark(  
         primary: Colors.deepPurple,
         onPrimary: Colors.white,
         surface: Color.fromARGB(255, 203, 156, 239),

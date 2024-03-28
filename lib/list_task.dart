@@ -17,6 +17,7 @@ String? name = FirebaseAuth.instance.currentUser?.displayName;
         return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
+          backgroundColor: Color.fromARGB(255, 203, 156, 239),
           title: Text('Task List'),
           leading: InkWell(
           onTap: () {
@@ -28,7 +29,24 @@ String? name = FirebaseAuth.instance.currentUser?.displayName;
           ),
         )),
         
-        body: FirebaseAnimatedList(
+        body: Container(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          color: Color.fromARGB(255, 203, 156, 239),
+          child: SingleChildScrollView(
+            child: Container(
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                padding: EdgeInsets.fromLTRB(5, 20, 0, 0),
+                 decoration: const BoxDecoration(
+                  color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(50.0),
+          bottomRight: Radius.circular(20.0),
+        ),
+        
+      ),
+      child: FirebaseAnimatedList(
           query: databaseRef,
           itemBuilder: (BuildContext context, DataSnapshot snapshot,
               Animation<double> animation, int index) {
@@ -43,8 +61,12 @@ String? name = FirebaseAuth.instance.currentUser?.displayName;
              data != null? data["time"]: "No time added");
           },
         ),
+          ),
+        )
+        
+        
       ),
-    );
+    ));
   }
 
     Widget CardViewData(BuildContext context, name, String task, String date, String time){
@@ -70,6 +92,8 @@ String? name = FirebaseAuth.instance.currentUser?.displayName;
               style:const TextStyle(
                 fontFamily: 'Montserrat',
               fontWeight: FontWeight.bold,
+              fontSize: 22.0
+
             
               ),),
               Text(task,
