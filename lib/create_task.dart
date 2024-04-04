@@ -174,7 +174,7 @@ class CreateTask extends StatelessWidget{
                 });
 
 
-                Navigator.push(context, MaterialPageRoute(builder: (context)=> ListTask()));
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> ListTask()));
                  
                   } else {
                     print("object");

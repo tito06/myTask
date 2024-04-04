@@ -10,10 +10,16 @@ class ListTask extends StatelessWidget{
 
 String? name = FirebaseAuth.instance.currentUser?.displayName;
 
-  DatabaseReference databaseRef = FirebaseDatabase.instance.ref("${FirebaseAuth.instance.currentUser?.displayName}");
+ // DatabaseReference databaseRef = FirebaseDatabase.instance.ref("${FirebaseAuth.instance.currentUser?.displayName}");
+
+  DatabaseReference databaseRef = FirebaseDatabase.instance.ref().child("${FirebaseAuth.instance.currentUser?.displayName}");
+
+
 
   @override
   Widget build(BuildContext context) {
+
+
         return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
@@ -47,11 +53,12 @@ String? name = FirebaseAuth.instance.currentUser?.displayName;
         
       ),
       child: FirebaseAnimatedList(
-          query: databaseRef,
+          query: databaseRef.orderByChild("date"),
           itemBuilder: (BuildContext context, DataSnapshot snapshot,
               Animation<double> animation, int index) {
                  
         final Map<dynamic, dynamic>? data = snapshot.value as Map<dynamic, dynamic>?;
+
 
                 
             return CardViewData(context,
@@ -74,8 +81,6 @@ String? name = FirebaseAuth.instance.currentUser?.displayName;
       elevation: 50,
       shadowColor: Colors.black,
       child: ConstrainedBox(
-        //width: MediaQuery.of(context).size.width,
-        //height: 120,
         constraints: (
           BoxConstraints(
             minWidth: MediaQuery.of(context).size.width,
@@ -83,7 +88,7 @@ String? name = FirebaseAuth.instance.currentUser?.displayName;
           )
         ),
         child: Padding(
-          padding: EdgeInsets.fromLTRB(10, 20, 10, 10),
+          padding: EdgeInsets.fromLTRB(15, 20, 15, 10),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
