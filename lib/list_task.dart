@@ -1,12 +1,21 @@
 
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
-class ListTask extends StatelessWidget{
-   ListTask({super.key});
+class ListTask extends StatefulWidget{
+  @override
+  State<StatefulWidget> createState() =>_ListTaskState();
 
+
+}
+
+class _ListTaskState extends State<ListTask> {
+  
 
 String? name = FirebaseAuth.instance.currentUser?.displayName;
 
@@ -14,13 +23,61 @@ String? name = FirebaseAuth.instance.currentUser?.displayName;
 
   DatabaseReference databaseRef = FirebaseDatabase.instance.ref().child("${FirebaseAuth.instance.currentUser?.displayName}");
 
+  List<Map<dynamic, dynamic>> sortedData = [];
+
+
+    @override
+  void initState() {
+    super.initState();
+    _getDataFromFirebase();
+  }
+
+  void _getDataFromFirebase() {
+
+    databaseRef.once().then((DatabaseEvent dataSnapshot) {
+     sortedData.clear();
+
+     Map<dynamic, dynamic> values = dataSnapshot.snapshot.value as Map<dynamic, dynamic>;
+
+     values.forEach((key, value) {
+      sortedData.add(value);
+     });
+
+      sortedData.sort((a,b){
+
+          // Parse the original date string
+    DateFormat originalFormat = DateFormat("E, MMM dd, yyyy");
+    DateTime parsedDateA = originalFormat.parse(a['date']);
+    DateTime parsedDateB = originalFormat.parse(b['date']);
+
+
+  // Format the parsed date to the desired format
+  DateFormat desiredFormat = DateFormat("yyyy-MM-dd");
+  String formattedDateA = desiredFormat.format(parsedDateA);
+    String formattedDateB = desiredFormat.format(parsedDateB);
+
+
+
+        var dateFormat = DateFormat("yyyy-MM-dd");
+        var dateA = dateFormat.parse(formattedDateA);
+        var dateB = dateFormat.parse(formattedDateB);
+        return dateA.compareTo(dateB);
+
+      });
+      setState(() {});
+  
+  });
+
+  }
 
 
   @override
   Widget build(BuildContext context) {
 
 
-        return MaterialApp(
+
+
+      return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
           backgroundColor: Color.fromARGB(255, 203, 156, 239),
@@ -40,6 +97,7 @@ String? name = FirebaseAuth.instance.currentUser?.displayName;
           height: MediaQuery.of(context).size.height,
           color: Color.fromARGB(255, 203, 156, 239),
           child: SingleChildScrollView(
+            scrollDirection: Axis.vertical,
             child: Container(
                 height: MediaQuery.of(context).size.height,
                 width: MediaQuery.of(context).size.width,
@@ -52,7 +110,18 @@ String? name = FirebaseAuth.instance.currentUser?.displayName;
         ),
         
       ),
-      child: FirebaseAnimatedList(
+      child: sortedData.isEmpty ?  Center(child: CircularProgressIndicator()) :
+      ListView.builder(
+        itemCount: sortedData.length,
+        itemBuilder: (context, index){
+           return CardViewData(context,
+            sortedData != null ? sortedData[index]["name"] : "NO DATA",
+             sortedData != null? sortedData[index]["task"] : "NO DATA",
+             sortedData != null? sortedData[index]["date"]: "No date added",
+             sortedData != null? sortedData[index]["time"]: "No time added");
+        })
+      
+  /*    FirebaseAnimatedList(
           query: databaseRef.orderByChild("date"),
           itemBuilder: (BuildContext context, DataSnapshot snapshot,
               Animation<double> animation, int index) {
@@ -67,7 +136,7 @@ String? name = FirebaseAuth.instance.currentUser?.displayName;
              data != null? data["date"]: "No date added",
              data != null? data["time"]: "No time added");
           },
-        ),
+        ), */
           ),
         )
         
@@ -79,7 +148,7 @@ String? name = FirebaseAuth.instance.currentUser?.displayName;
     Widget CardViewData(BuildContext context, name, String task, String date, String time){
     return Card(
       elevation: 50,
-      shadowColor: Colors.black,
+      shadowColor: Colors.white,
       child: ConstrainedBox(
         constraints: (
           BoxConstraints(

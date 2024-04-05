@@ -27,15 +27,81 @@ class _homePagestate extends State<HomePage>{
 
 
     String? date = DateFormat.yMMMEd().format(DateTime.now());
-    var dataDate;
+    String dataDate= "";
+    String dataDateTwo =  "";
 
     List<String> dataList = [];
+    List<Map<dynamic, dynamic>> sortedData = [];
 
-   //DatabaseReference databaseRef = FirebaseDatabase.instance.ref("${FirebaseAuth.instance.currentUser?.displayName}");
+
+    var noData = 0;
+
 
    DatabaseReference databaseRef = FirebaseDatabase.instance.ref().child("${FirebaseAuth.instance.currentUser?.displayName}");
 
-   
+  void _getDataFromFirebase() {
+
+    databaseRef.once().then((DatabaseEvent dataSnapshot) {
+     sortedData.clear();
+
+     Map<dynamic, dynamic> values = dataSnapshot.snapshot.value as Map<dynamic, dynamic>;
+
+     values.forEach((key, value) {
+      sortedData.add(value);
+     });
+           sortedData.sort((a,b){
+
+          // Parse the original date string
+    DateFormat originalFormat = DateFormat("E, MMM dd, yyyy");
+    DateTime parsedDateA = originalFormat.parse(a['date']);
+    DateTime parsedDateB = originalFormat.parse(b['date']);
+
+
+  // Format the parsed date to the desired format
+  DateFormat desiredFormat = DateFormat("yyyy-MM-dd");
+  String formattedDateA = desiredFormat.format(parsedDateA);
+    String formattedDateB = desiredFormat.format(parsedDateB);
+
+
+
+        var dateFormat = DateFormat("yyyy-MM-dd");
+        var dateA = dateFormat.parse(formattedDateA);
+        var dateB = dateFormat.parse(formattedDateB);
+        return dateA.compareTo(dateB);
+
+      });
+      setState(() {});
+    });
+  }
+
+
+    getDataCount(String date, String dateDate) async {
+
+  
+      if(sortedData.isNotEmpty){
+     
+       for(int i= 0; i< sortedData.length; i++){
+        if(sortedData[i]['date'] == date){
+          setState(() {
+                      noData++;
+
+          });
+        } 
+       }
+      
+      }
+      
+
+      print("noData-> ${noData}");
+      return noData;
+    }
+
+    @override
+    void initState(){
+      super.initState();
+      _getDataFromFirebase();
+      getDataCount(date!, dataDateTwo);
+    }
 
 
   _changeTab(int index) {
@@ -55,6 +121,7 @@ class _homePagestate extends State<HomePage>{
   Widget build(BuildContext context) {
 
       var name = FirebaseAuth.instance.currentUser?.displayName;
+
 
     return Scaffold(
     
@@ -109,8 +176,8 @@ class _homePagestate extends State<HomePage>{
                     fontFamily: 'Montserrat',
                     color: Colors.black,
                     fontWeight: FontWeight.bold),),
-                    const Text("you have 7 tasks today.",
-                    style: TextStyle(fontSize: 20,
+                    Text("you have $noData tasks ${(dataDate == date)? "": "today" }.",
+                    style: const TextStyle(fontSize: 20,
                     fontFamily: 'Montserrat',
                     fontWeight: FontWeight.bold),)
                   ]),
@@ -158,26 +225,42 @@ class _homePagestate extends State<HomePage>{
                   )
                 ),
                 Expanded(
-                  child:  FirebaseAnimatedList(
+                  child: 
+                  
+                   FirebaseAnimatedList(
           query: databaseRef,
           itemBuilder: (BuildContext context, DataSnapshot snapshot,
               Animation<double> animation, int index) {
                  
               final Map<dynamic, dynamic>? data = snapshot.value as Map<dynamic, dynamic>?;
               if(data!= null){
-                
-                data['key'] = snapshot.key;
+
+                          // Parse the original date string
+    DateFormat originalFormat = DateFormat("E, MMM dd, yyyy");
+    DateTime parsedDateA = originalFormat.parse(data['date']);
+
+
+  // Format the parsed date to the desired format
+    DateFormat desiredFormat = DateFormat("yyyy-MM-dd");
+    String formattedDateA = desiredFormat.format(parsedDateA);
+
+
+                   data['key'] = snapshot.key;
 
                  dataDate = data["date"];
-                  
-               
-              }
+                  getDataCount(date.toString(), formattedDateA);
+            }
+
+
 
             return ( dataDate == date)?
              CardViewData(data!) : const SizedBox();
             
           },
-        ), )
+        ),
+        
+        
+         )
               ],
             ),
 
@@ -296,7 +379,11 @@ class _homePagestate extends State<HomePage>{
 
           
             date = formattedDate;
+
+            noData = 0;
+            
           
+            getDataCount(date.toString(), dataDateTwo);
 
           });
         }
