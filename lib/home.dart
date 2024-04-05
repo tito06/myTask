@@ -28,9 +28,7 @@ class _homePagestate extends State<HomePage>{
 
     String? date = DateFormat.yMMMEd().format(DateTime.now());
     String dataDate= "";
-    String dataDateTwo =  "";
 
-    List<String> dataList = [];
     List<Map<dynamic, dynamic>> sortedData = [];
 
 
@@ -75,7 +73,7 @@ class _homePagestate extends State<HomePage>{
   }
 
 
-    getDataCount(String date, String dateDate) async {
+    getDataCount(String date) async {
 
   
       if(sortedData.isNotEmpty){
@@ -100,7 +98,7 @@ class _homePagestate extends State<HomePage>{
     void initState(){
       super.initState();
       _getDataFromFirebase();
-      getDataCount(date!, dataDateTwo);
+      getDataCount(date!);
     }
 
 
@@ -176,7 +174,7 @@ class _homePagestate extends State<HomePage>{
                     fontFamily: 'Montserrat',
                     color: Colors.black,
                     fontWeight: FontWeight.bold),),
-                    Text("you have $noData tasks ${(dataDate == date)? "": "today" }.",
+                    Text("you have $noData ${(noData==1 || noData == 0)? "task" : "tasks"} ${(dataDate != "")? "": "today" }.",
                     style: const TextStyle(fontSize: 20,
                     fontFamily: 'Montserrat',
                     fontWeight: FontWeight.bold),)
@@ -235,20 +233,11 @@ class _homePagestate extends State<HomePage>{
               final Map<dynamic, dynamic>? data = snapshot.value as Map<dynamic, dynamic>?;
               if(data!= null){
 
-                          // Parse the original date string
-    DateFormat originalFormat = DateFormat("E, MMM dd, yyyy");
-    DateTime parsedDateA = originalFormat.parse(data['date']);
-
-
-  // Format the parsed date to the desired format
-    DateFormat desiredFormat = DateFormat("yyyy-MM-dd");
-    String formattedDateA = desiredFormat.format(parsedDateA);
-
-
+    
                    data['key'] = snapshot.key;
 
                  dataDate = data["date"];
-                  getDataCount(date.toString(), formattedDateA);
+                  getDataCount(date.toString());
             }
 
 
@@ -383,7 +372,7 @@ class _homePagestate extends State<HomePage>{
             noData = 0;
             
           
-            getDataCount(date.toString(), dataDateTwo);
+            getDataCount(date.toString());
 
           });
         }
