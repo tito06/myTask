@@ -81,7 +81,7 @@ class _homePagestate extends State<HomePage>{
        for(int i= 0; i< sortedData.length; i++){
         if(sortedData[i]['date'] == date){
           setState(() {
-                      noData++;
+          noData++;
 
           });
         } 
@@ -97,6 +97,7 @@ class _homePagestate extends State<HomePage>{
     @override
     void initState(){
       super.initState();
+      noData =0;
       _getDataFromFirebase();
       getDataCount(date!);
     }
@@ -173,11 +174,11 @@ class _homePagestate extends State<HomePage>{
                     style: const TextStyle(fontSize: 20,
                     fontFamily: 'Montserrat',
                     color: Colors.black,
-                    fontWeight: FontWeight.bold),),
+                    fontWeight: FontWeight.w300),),
                     Text("you have $noData ${(noData==1 || noData == 0)? "task" : "tasks"} ${(dataDate != "")? "": "today" }.",
-                    style: const TextStyle(fontSize: 20,
-                    fontFamily: 'Montserrat',
-                    fontWeight: FontWeight.bold),)
+                    style: const TextStyle(fontSize: 18,
+                    fontFamily: 'Montserrat'
+                    ),)
                   ]),
                 ),
         
@@ -210,7 +211,7 @@ class _homePagestate extends State<HomePage>{
                   
                 style: const TextStyle(fontSize: 20,
               fontFamily: 'Montserrat',
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w200,
               color: Colors.black87
             
                 )),
@@ -306,24 +307,24 @@ class _homePagestate extends State<HomePage>{
              Text(data['name'],
               style:const TextStyle(
                 fontFamily: 'Montserrat',
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w500,
               fontSize: 22.0
             
               ),),
               Text(data['task'],
               style: const TextStyle(
                 fontFamily: 'Montserrat',
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w500,
               ),),
               Text(data['date'],
               style: const TextStyle(
                 fontFamily: 'Montserrat',
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w500,
               ),),
               Text(data['time'],
               style: const TextStyle(
                 fontFamily: 'Montserrat',
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w500,
               ),)   
             ]),
 

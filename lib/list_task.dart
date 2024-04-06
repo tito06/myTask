@@ -6,6 +6,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:my_task/home.dart';
 
 class ListTask extends StatefulWidget{
   @override
@@ -80,11 +81,11 @@ String? name = FirebaseAuth.instance.currentUser?.displayName;
       return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          backgroundColor: Color.fromARGB(255, 203, 156, 239),
-          title: Text('Task List'),
+          backgroundColor: const Color.fromARGB(255, 203, 156, 239),
+          title: const Text('Task List'),
           leading: InkWell(
           onTap: () {
-            Navigator.pop(context);
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> HomePage()));
           },
           child:const Icon(
             Icons.arrow_back_ios,
@@ -95,22 +96,21 @@ String? name = FirebaseAuth.instance.currentUser?.displayName;
         body: Container(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
-          color: Color.fromARGB(255, 203, 156, 239),
+          color: const Color.fromARGB(255, 203, 156, 239),
           child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
+            
             child: Container(
                 height: MediaQuery.of(context).size.height,
-                width: MediaQuery.of(context).size.width,
-                padding: EdgeInsets.fromLTRB(5, 20, 0, 0),
+                width: MediaQuery.of(context).size.width ,
+                padding:const EdgeInsets.fromLTRB(5, 20, 0, 0),
                  decoration: const BoxDecoration(
                   color: Colors.white,
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(50.0),
-          bottomRight: Radius.circular(20.0),
         ),
         
       ),
-      child: sortedData.isEmpty ?  Center(child: CircularProgressIndicator()) :
+      child: sortedData.isEmpty ? const Center(child: CircularProgressIndicator()) :
       ListView.builder(
         itemCount: sortedData.length,
         itemBuilder: (context, index){
@@ -121,22 +121,7 @@ String? name = FirebaseAuth.instance.currentUser?.displayName;
              sortedData != null? sortedData[index]["time"]: "No time added");
         })
       
-  /*    FirebaseAnimatedList(
-          query: databaseRef.orderByChild("date"),
-          itemBuilder: (BuildContext context, DataSnapshot snapshot,
-              Animation<double> animation, int index) {
-                 
-        final Map<dynamic, dynamic>? data = snapshot.value as Map<dynamic, dynamic>?;
 
-
-                
-            return CardViewData(context,
-            data != null ? data["name"] : "NO DATA",
-             data != null? data["task"] : "NO DATA",
-             data != null? data["date"]: "No date added",
-             data != null? data["time"]: "No time added");
-          },
-        ), */
           ),
         )
         
@@ -147,8 +132,7 @@ String? name = FirebaseAuth.instance.currentUser?.displayName;
 
     Widget CardViewData(BuildContext context, name, String task, String date, String time){
     return Card(
-      elevation: 50,
-      shadowColor: Colors.white,
+      elevation: 10,
       child: ConstrainedBox(
         constraints: (
           BoxConstraints(
@@ -165,7 +149,7 @@ String? name = FirebaseAuth.instance.currentUser?.displayName;
              Text(name,
               style:const TextStyle(
                 fontFamily: 'Montserrat',
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w500,
               fontSize: 22.0
 
             
@@ -173,17 +157,17 @@ String? name = FirebaseAuth.instance.currentUser?.displayName;
               Text(task,
               style: const TextStyle(
                 fontFamily: 'Montserrat',
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w500,
               ),),
               Text(date,
               style: const TextStyle(
                 fontFamily: 'Montserrat',
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w500,
               ),),
               Text(time,
               style: const TextStyle(
                 fontFamily: 'Montserrat',
-              fontWeight: FontWeight.w700,
+              fontWeight: FontWeight.w500,
               ),)  
             ]),),
       ),
