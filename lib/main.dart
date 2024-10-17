@@ -1,4 +1,3 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -14,30 +13,24 @@ import 'package:shared_preferences/shared_preferences.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp( MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-   MyApp({super.key});
+  MyApp({super.key});
 
-  DatabaseReference databaseRef = FirebaseDatabase.instance.ref("${FirebaseAuth.instance.currentUser?.displayName}");
+  DatabaseReference databaseRef = FirebaseDatabase.instance
+      .ref("${FirebaseAuth.instance.currentUser?.displayName}");
 
   @override
-  Widget build(BuildContext context)  {
-
-
+  Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
+        debugShowCheckedModeBanner: false,
+        title: 'Flutter Demo',
+        home: //const HomePage());
 
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: //const HomePage());
-      
-      FirebaseAuth.instance.currentUser != null ? HomePage() : Login());
-    
+            FirebaseAuth.instance.currentUser != null
+                ? const HomePage()
+                : const Login());
   }
 }
-
